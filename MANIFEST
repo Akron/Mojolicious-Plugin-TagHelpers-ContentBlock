@@ -4,6 +4,7 @@ t/content_block_position.t
 t/ExamplePlugin/Admin.pm
 t/ExamplePlugin/Email.pm
 t/ExamplePlugin/Preferences.pm
+t/ExamplePlugin/preferences.html.ep
 Changes
 MANIFEST
 LICENSE
