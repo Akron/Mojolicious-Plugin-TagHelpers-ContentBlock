@@ -27,7 +27,6 @@ get '/' => sub {
 my $t = Test::Mojo->new;
 
 $t->get_ok('/')
-  ->text_is('#error', '')
   ->status_is(200)
   ->element_count_is('nav > *', 0);
 
@@ -46,20 +45,10 @@ $t->get_ok('/')
   ->element_count_is('nav > *', 2)
   ->text_is('nav > a', 'Admin')
   ->text_is('nav > a[rel=admin]', 'Admin')
-  ->text_is('nav > a[rel=email]', 'akron@sojolicio.us');
-
-get '/newmail' => sub {
-  my $c = shift;
-  $c->stash(email_address => 'peter@sojolicio.us');
-  $c->render(inline => $navi_template);
-};
-
-$t->get_ok('/newmail')
-  ->status_is(200)
-  ->element_count_is('nav > *', 2)
-  ->text_is('nav > a', 'Admin')
-  ->text_is('nav > a[rel=admin]', 'Admin')
-  ->text_is('nav > a[rel=email]', 'peter@sojolicio.us');
+  ->text_is('nav > a[rel=email]', 'akron@sojolicio.us')
+  ->text_is('nav > a:nth-of-type(1)', 'Admin')
+  ->text_is('nav > a:nth-of-type(2)', 'akron@sojolicio.us')
+  ;
 
 get '/withhome' => sub {
   my $c = shift;
@@ -67,27 +56,42 @@ get '/withhome' => sub {
   $c->content_block(
     administration => (
       inline => q!<%= link_to 'Home' => '/home', rel => 'home' %>!,
-      position => 1000
+      position => 20
     )
   );
 
   $c->render(inline => $navi_template);
 };
 
+
 $t->get_ok('/withhome')
   ->status_is(200)
   ->element_count_is('nav > *', 3)
   ->text_is('nav > a', 'Admin')
-  ->text_is('nav > a[rel=admin]', 'Admin')
-  ->text_is('nav > a[rel=email]', 'akron@sojolicio.us')
-  ->text_is('nav > a[rel=home]', 'Home');
+  ->text_is('nav > a:nth-of-type(1)', 'Admin')
+  ->text_is('nav > a:nth-of-type(2)', 'Home')
+  ->text_is('nav > a:nth-of-type(3)', 'akron@sojolicio.us')
+  ;
+
+app->plugin('Preferences');
+
+$t->get_ok('/withhome')
+  ->status_is(200)
+  ->element_count_is('nav > *', 4)
+  ->text_is('nav > a:nth-of-type(1)', 'Admin')
+  ->text_is('nav > a:nth-of-type(2)', 'Preferences')
+  ->text_is('nav > a:nth-of-type(3)', 'Home')
+  ->text_is('nav > a:nth-of-type(4)', 'akron@sojolicio.us')
+  ;
 
 $t->get_ok('/')
   ->status_is(200)
-  ->element_count_is('nav > *', 2)
-  ->text_is('nav > a', 'Admin')
-  ->text_is('nav > a[rel=admin]', 'Admin')
-  ->text_is('nav > a[rel=email]', 'akron@sojolicio.us');
+  ->element_count_is('nav > *', 3)
+  ->text_is('nav > a:nth-of-type(1)', 'Admin')
+  ->text_is('nav > a:nth-of-type(2)', 'Preferences')
+  ->text_is('nav > a:nth-of-type(3)', 'akron@sojolicio.us')
+  ;
 
-done_testing();
+
+done_testing;
 __END__

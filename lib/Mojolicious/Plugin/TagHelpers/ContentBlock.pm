@@ -2,7 +2,23 @@ package Mojolicious::Plugin::TagHelpers::ContentBlock;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream 'b';
 
-our $VERSION = '0.01_1';
+our $VERSION = '0.01_2';
+
+sub position_sort {
+  if ($a->{position} < $b->{position}) {
+    return -1;
+  }
+  elsif ($a->{position} > $b->{position}) {
+    return 1;
+  }
+  elsif ($a->{position_b} < $b->{position_b}) {
+    return -1;
+  }
+  elsif ($a->{position_b} > $b->{position_b}) {
+    return 1;
+  };
+  return 0;
+}
 
 sub register {
   my ($self, $app) = @_;
@@ -13,36 +29,60 @@ sub register {
   # Add elements to a content block
   $app->helper(
     content_block => sub {
-      my ($c, $name, $template) = @_;
-
-      $content_block{$name} ||= [];
-      $c->stash->{'cblock.' . $name} ||= [];
+      my $c = shift;
+      my $name = shift;
 
       # No template - release
-      unless ($template) {
+      unless (@_) {
 	my $string = '';
 
+	my @blocks;
+	@blocks = @{$content_block{$name}} if $content_block{$name};
+	push(@blocks, @{$c->stash('cblock.'. $name)}) if $c->stash('cblock.'. $name);
+
 	# Iterate over default and stash content blocks
-	foreach (@{$content_block{$name}}, @{$c->stash('cblock.'. $name)}) {
-	  next unless $_;
-	  $string .= (ref $_ ? $_->($c) : $c->render_to_string(inline => $_));
+	foreach (sort position_sort @blocks) {
+
+	  # Render inline template
+	  if ($_->{inline}) {
+	    $string .= $c->render_to_string(inline => $_->{inline});
+	  }
+
+	  # Render template
+	  elsif ($_->{template}) {
+	    $string .= $c->render_to_string(template => $_->{template});
+	  }
+
+	  # Render callback
+	  elsif ($_->{cb}) {
+	    $string .= $_->($c);
+	  };
 	};
 
 	# Return content block
 	return b($string);
       };
 
+      my $cb = pop if @_ % 2;
+
+      my %element = @_;
+
+      $content_block{$name} ||= [];
+
+      $element{cb} = $cb if $cb;
+      $element{position} //= 0;
+      $element{position_b} = scalar @{$content_block{$name}};
+
       # Probably called from app
       if ($c->tx->{req}) {
-
 	# Add template to content block
-	push(@{$c->stash->{'cblock.' . $name}}, $template);
+	push(@{$c->stash->{'cblock.' . $name} ||= []}, \%element);
       }
 
       # Called from controller
       else {
 	# Add template to content block
-	push(@{$content_block{$name}}, $template);
+	push(@{$content_block{$name}}, \%element);
       };
     }
   );
@@ -71,7 +111,9 @@ Mojolicious::Plugin::TagHelpers::ContentBlock - Mojolicious Plugin for Content B
 
   # Add snippets to a content block, e.g. from a plugin
   app->content_block(
-    admin => '<%= link_to 'Edit' => '/edit' %>'
+    admin => (
+      inline => '<%= link_to 'Edit' => '/edit' %>',
+    )
   );
 
   # In a template
@@ -106,11 +148,12 @@ Register plugin in L<Mojolicious> application.
 
   # From a controller
   $c->content_block(
-    admin => '<%= link_to 'Edit' => '/edit' %>'
+    admin => '<%= link_to 'Edit' => '/edit' %>',
+    position => 40
   );
 
   # From a template
-  % content_block 'admin', begin
+  % content_block 'admin', position => 9, begin
     <%= link_to 'Edit' => '/edit' %>
   % end
 
@@ -124,6 +167,10 @@ and call the contents from a template.
 In difference to L<Mojolicious::Plugin::DefaultHelpers/content_for|content_for>,
 content of the content block can be defined in a global cache during
 startup.
+
+Supported content parameters are C<template> or C<inline>. Additionally a
+numeric C<position> value can be passed. If C<position> is omitted,
+the default position is C<0>.
 
 
 =head1 DEPENDENCIES
