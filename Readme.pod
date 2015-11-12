@@ -15,7 +15,9 @@ Mojolicious::Plugin::TagHelpers::ContentBlock - Mojolicious Plugin for Content B
 
   # Add snippets to a content block, e.g. from a plugin
   app->content_block(
-    admin => '<%= link_to 'Edit' => '/edit' %>'
+    admin => (
+      inline => '<%= link_to 'Edit' => '/edit' %>',
+    )
   );
 
   # In a template
@@ -50,11 +52,12 @@ Register plugin in L<Mojolicious> application.
 
   # From a controller
   $c->content_block(
-    admin => '<%= link_to 'Edit' => '/edit' %>'
+    admin => '<%= link_to 'Edit' => '/edit' %>',
+    position => 40
   );
 
   # From a template
-  % content_block 'admin', begin
+  % content_block 'admin', position => 9, begin
     <%= link_to 'Edit' => '/edit' %>
   % end
 
@@ -68,6 +71,10 @@ and call the contents from a template.
 In difference to L<Mojolicious::Plugin::DefaultHelpers/content_for|content_for>,
 content of the content block can be defined in a global cache during
 startup.
+
+Supported content parameters are C<template> or C<inline>. Additionally a
+numeric C<position> value can be passed. If C<position> is omitted,
+the default position is C<0>.
 
 
 =head1 DEPENDENCIES
