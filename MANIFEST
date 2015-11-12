@@ -1,0 +1,8 @@
+lib/Mojolicious/Plugin/TagHelpers/ContentBlock.pm
+t/content_block.t
+t/ExamplePlugin/Admin.pm
+t/ExamplePlugin/Email.pm
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
