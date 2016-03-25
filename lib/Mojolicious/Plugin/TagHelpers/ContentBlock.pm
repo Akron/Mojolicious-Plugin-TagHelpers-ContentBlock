@@ -2,8 +2,10 @@ package Mojolicious::Plugin::TagHelpers::ContentBlock;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream 'b';
 
-our $VERSION = '0.01_2';
+our $VERSION = '0.02';
 
+# Sort based on the manual given position
+# or the order the element was added
 sub position_sort {
   if ($a->{position} < $b->{position}) {
     return -1;
@@ -11,6 +13,9 @@ sub position_sort {
   elsif ($a->{position} > $b->{position}) {
     return 1;
   }
+
+  # Manual positions are even, check order
+  # of addition
   elsif ($a->{position_b} < $b->{position_b}) {
     return -1;
   }
@@ -18,8 +23,10 @@ sub position_sort {
     return 1;
   };
   return 0;
-}
+};
 
+
+# Register the plugin
 sub register {
   my ($self, $app) = @_;
 
@@ -32,13 +39,22 @@ sub register {
       my $c = shift;
       my $name = shift;
 
-      # No template - release
+      # No template passed - return content
       unless (@_) {
 	my $string = '';
 
+	# TODO: This may be optimizable - by sorting in advance and possibly
+	# attaching compiled templates all the way. The only problem is the
+	# difference between application called contents and controller
+	# called contents.
+
+	# The blocks are based on elements from the global
+	# hash and from the stash
 	my @blocks;
 	@blocks = @{$content_block{$name}} if $content_block{$name};
-	push(@blocks, @{$c->stash('cblock.'. $name)}) if $c->stash('cblock.'. $name);
+	if ($c->stash('cblock.'. $name)) {
+	  push(@blocks, @{$c->stash('cblock.'. $name)});
+	};
 
 	# Iterate over default and stash content blocks
 	foreach (sort position_sort @blocks) {
@@ -63,24 +79,33 @@ sub register {
 	return b($string);
       };
 
+
+      # Parameter number is odd - get the last element as a template callback
       my $cb = pop if @_ % 2;
 
       my %element = @_;
 
+      # Content block not yet defined
       $content_block{$name} ||= [];
 
+      # The template may be defined either as 'cb', 'template' or 'inline'
       $element{cb} = $cb if $cb;
+
+      # Two position definitions - first manually defined,
+      # the second based on the position in the block
       $element{position} //= 0;
       $element{position_b} = scalar @{$content_block{$name}};
 
       # Probably called from app
       if ($c->tx->{req}) {
+
 	# Add template to content block
 	push(@{$c->stash->{'cblock.' . $name} ||= []}, \%element);
       }
 
       # Called from controller
       else {
+
 	# Add template to content block
 	push(@{$content_block{$name}}, \%element);
       };
@@ -116,8 +141,9 @@ Mojolicious::Plugin::TagHelpers::ContentBlock - Mojolicious Plugin for Content B
     )
   );
 
-  # In a template
+  # Call in a template
   %= content_block 'admin'
+
 
 =head1 DESCRIPTION
 
@@ -126,16 +152,19 @@ to create pluggable content blocks for page views.
 
 B<Warning! This is early software! Use at your own risk!>
 
+
 =head1 METHODS
 
 L<Mojolicious::Plugin::TagHelpers::ContentBlocks> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
 
+
 =head2 register
 
   $plugin->register(Mojolicious->new);
 
-Register plugin in L<Mojolicious> application.
+Register plugin in a L<Mojolicious> application.
+
 
 =head1 HELPERS
 
@@ -160,8 +189,8 @@ Register plugin in L<Mojolicious> application.
   # Calling the content block
   %= content_block 'admin'
 
-Add content to a named content block, like with
-L<Mojolicious::Plugin::DefaultHelpers/content_for|content_for>,
+Add content to a named content block (like with
+L<Mojolicious::Plugin::DefaultHelpers/content_for|content_for>)
 and call the contents from a template.
 
 In difference to L<Mojolicious::Plugin::DefaultHelpers/content_for|content_for>,
@@ -185,7 +214,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2015-2016, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.
