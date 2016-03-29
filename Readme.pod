@@ -1,3 +1,5 @@
+=pod
+
 =encoding utf8
 
 =head1 NAME
@@ -7,20 +9,34 @@ Mojolicious::Plugin::TagHelpers::ContentBlock - Mojolicious Plugin for Content B
 
 =head1 SYNOPSIS
 
-  # Mojolicious
-  $self->plugin('TagHelpers::ContentBlock');
+  use Mojolicious::Lite;
 
-  # Mojolicious::Lite
   plugin 'TagHelpers::ContentBlock';
 
-  # Add snippets to a content block, e.g. from a plugin
+  # Add snippets to a named content block, e.g. from a plugin
   app->content_block(
     admin => (
-      inline => '<%= link_to 'Edit' => '/edit' %>',
+      inline => "<%= link_to 'Edit' => '/edit' %>"
     )
   );
 
-  # Call in a template
+  # or in a controller:
+  get '/' => sub {
+    my $c = shift;
+    $c->content_block(
+      admin => (
+        inline => "<%= link_to 'Logout' => '/logout' %>",
+        position => 20
+      )
+    );
+    $c->render(template => 'home');
+  };
+
+  app->start;
+
+  __DATA__
+  @@ home.html.ep
+  %# Call in a template
   %= content_block 'admin'
 
 
