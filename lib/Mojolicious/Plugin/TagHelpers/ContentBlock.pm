@@ -171,7 +171,7 @@ B<Warning! This is early software! Use at your own risk!>
 
 =head1 METHODS
 
-L<Mojolicious::Plugin::TagHelpers::ContentBlocks> inherits all methods from
+L<Mojolicious::Plugin::TagHelpers::ContentBlock> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
 
 
@@ -188,13 +188,17 @@ Register plugin in a L<Mojolicious> application.
 
   # In a plugin
   $app->content_block(
-    admin => '<%= link_to 'Edit' => '/edit' %>'
+    admin => (
+      inline => '<%= link_to 'Edit' => '/edit' %>'
+    )
   );
 
   # From a controller
   $c->content_block(
-    admin => '<%= link_to 'Edit' => '/edit' %>',
-    position => 40
+    admin => (
+      inline => '<%= link_to 'Edit' => '/edit' %>',
+      position => 40
+    )
   );
 
   # From a template
@@ -213,9 +217,10 @@ In difference to L<Mojolicious::Plugin::DefaultHelpers/content_for|content_for>,
 content of the content block can be defined in a global cache during
 startup.
 
-Supported content parameters are C<template> or C<inline>. Additionally a
-numeric C<position> value can be passed. If C<position> is omitted,
-the default position is C<0>.
+Supported content parameters are C<template> or C<inline>.
+Additionally a numeric C<position> value can be passed, defining the order of elements
+in the content block. If C<position> is omitted,
+the default position is C<0>. Position values may be positive or negative.
 
 
 =head1 DEPENDENCIES
