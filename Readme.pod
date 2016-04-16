@@ -39,7 +39,6 @@ Mojolicious::Plugin::TagHelpers::ContentBlock - Mojolicious Plugin for Content B
   %# Call in a template
   %= content_block 'admin'
 
-
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::TagHelpers::ContentBlock> is a L<Mojolicious> plugin
@@ -100,6 +99,18 @@ Supported content parameters are C<template> or C<inline>.
 Additionally a numeric C<position> value can be passed, defining the order of elements
 in the content block. If C<position> is omitted,
 the default position is C<0>. Position values may be positive or negative.
+
+
+=head2 content_block_ok
+
+  # In a template
+  % if (content_block_ok('admin')) {
+    <ul>
+    %= content_block 'admin'
+    </ul>
+  % };
+
+Check if a C<content_block> contains elements.
 
 
 =head1 DEPENDENCIES
