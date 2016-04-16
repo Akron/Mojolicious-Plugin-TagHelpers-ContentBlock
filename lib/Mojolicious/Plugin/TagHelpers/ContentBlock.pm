@@ -2,7 +2,7 @@ package Mojolicious::Plugin::TagHelpers::ContentBlock;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream 'b';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # Sort based on the manual given position
 # or the order the element was added
@@ -111,6 +111,20 @@ sub register {
       };
     }
   );
+
+  # Check, if the content block has any elements
+  $app->helper(
+    content_block_ok => sub {
+      my ($c, $name) = @_;
+
+      return unless $name;
+      if ($content_block{$name}) {
+	return 1 if @{$content_block{$name}};
+      };
+      return 1 if $c->stash('cblock.'. $name);
+      return;
+    }
+  );
 };
 
 
@@ -159,7 +173,6 @@ Mojolicious::Plugin::TagHelpers::ContentBlock - Mojolicious Plugin for Content B
   @@ home.html.ep
   %# Call in a template
   %= content_block 'admin'
-
 
 =head1 DESCRIPTION
 
@@ -221,6 +234,18 @@ Supported content parameters are C<template> or C<inline>.
 Additionally a numeric C<position> value can be passed, defining the order of elements
 in the content block. If C<position> is omitted,
 the default position is C<0>. Position values may be positive or negative.
+
+
+=head2 content_block_ok
+
+  # In a template
+  % if (content_block_ok('admin')) {
+    <ul>
+    %= content_block 'admin'
+    </ul>
+  % };
+
+Check if a C<content_block> contains elements.
 
 
 =head1 DEPENDENCIES
