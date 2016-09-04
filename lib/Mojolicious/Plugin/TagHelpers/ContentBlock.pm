@@ -6,7 +6,9 @@ our $VERSION = '0.03';
 
 # Sort based on the manual given position
 # or the order the element was added
-sub position_sort {
+sub _position_sort {
+
+  # Sort by manual positions
   if ($a->{position} < $b->{position}) {
     return -1;
   }
@@ -41,42 +43,42 @@ sub register {
 
       # No template passed - return content
       unless (@_) {
-	my $string = '';
+        my $string = '';
 
-	# TODO: This may be optimizable - by sorting in advance and possibly
-	# attaching compiled templates all the way. The only problem is the
-	# difference between application called contents and controller
-	# called contents.
+        # TODO: This may be optimizable - by sorting in advance and possibly
+        # attaching compiled templates all the way. The only problem is the
+        # difference between application called contents and controller
+        # called contents.
 
-	# The blocks are based on elements from the global
-	# hash and from the stash
-	my @blocks;
-	@blocks = @{$content_block{$name}} if $content_block{$name};
-	if ($c->stash('cblock.'. $name)) {
-	  push(@blocks, @{$c->stash('cblock.'. $name)});
-	};
+        # The blocks are based on elements from the global
+        # hash and from the stash
+        my @blocks;
+        @blocks = @{$content_block{$name}} if $content_block{$name};
+        if ($c->stash('cblock.'. $name)) {
+          push(@blocks, @{$c->stash('cblock.'. $name)});
+        };
 
-	# Iterate over default and stash content blocks
-	foreach (sort position_sort @blocks) {
+        # Iterate over default and stash content blocks
+        foreach (sort _position_sort @blocks) {
 
-	  # Render inline template
-	  if ($_->{inline}) {
-	    $string .= $c->render_to_string(inline => $_->{inline});
-	  }
+          # Render inline template
+          if ($_->{inline}) {
+            $string .= $c->render_to_string(inline => $_->{inline});
+          }
 
-	  # Render template
-	  elsif ($_->{template}) {
-	    $string .= $c->render_to_string(template => $_->{template});
-	  }
+          # Render template
+          elsif ($_->{template}) {
+            $string .= $c->render_to_string(template => $_->{template});
+          }
 
-	  # Render callback
-	  elsif ($_->{cb}) {
-	    $string .= $_->($c);
-	  };
-	};
+          # Render callback
+          elsif ($_->{cb}) {
+            $string .= $_->($c);
+          };
+        };
 
-	# Return content block
-	return b($string);
+        # Return content block
+        return b($string);
       };
 
 
@@ -99,15 +101,15 @@ sub register {
       # Probably called from app
       if ($c->tx->{req}) {
 
-	# Add template to content block
-	push(@{$c->stash->{'cblock.' . $name} ||= []}, \%element);
+        # Add template to content block
+        push(@{$c->stash->{'cblock.' . $name} ||= []}, \%element);
       }
 
       # Called from controller
       else {
 
-	# Add template to content block
-	push(@{$content_block{$name}}, \%element);
+        # Add template to content block
+        push(@{$content_block{$name}}, \%element);
       };
     }
   );
@@ -119,7 +121,7 @@ sub register {
 
       return unless $name;
       if ($content_block{$name}) {
-	return 1 if @{$content_block{$name}};
+        return 1 if @{$content_block{$name}};
       };
       return 1 if $c->stash('cblock.'. $name);
       return;
