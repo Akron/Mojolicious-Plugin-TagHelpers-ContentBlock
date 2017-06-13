@@ -2,7 +2,7 @@ package Mojolicious::Plugin::TagHelpers::ContentBlock;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream 'b';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # Sort based on the manual given position
 # or the order the element was added
@@ -63,17 +63,17 @@ sub register {
 
           # Render inline template
           if ($_->{inline}) {
-            $string .= $c->render_to_string(inline => $_->{inline});
+            $string .= $c->render_to_string(inline => $_->{inline}) // '';
           }
 
           # Render template
           elsif ($_->{template}) {
-            $string .= $c->render_to_string(template => $_->{template});
+            $string .= $c->render_to_string(template => $_->{template}) // '';
           }
 
           # Render callback
           elsif ($_->{cb}) {
-            $string .= $_->($c);
+            $string .= $_->($c) // '';
           };
         };
 

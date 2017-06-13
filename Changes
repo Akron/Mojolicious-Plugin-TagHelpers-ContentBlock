@@ -1,5 +1,6 @@
-0.04 2016-09-12
+0.04 2017-06-13
         - Made access rights Kwalitee compliant.
+        - Improved string handling without return values.
 
 0.03 2016-04-16
         - Added content_block_ok.
@@ -9,4 +10,4 @@
 
 0.01 2015-11-12
         - Initial submission to GitHub.
-	- Add position and template support.
+        - Add position and template support.
