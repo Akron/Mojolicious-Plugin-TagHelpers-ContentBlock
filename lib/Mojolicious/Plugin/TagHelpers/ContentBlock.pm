@@ -45,10 +45,11 @@ sub register {
       unless (@_) {
         my $string = '';
 
-        # TODO: This may be optimizable - by sorting in advance and possibly
-        # attaching compiled templates all the way. The only problem is the
-        # difference between application called contents and controller
-        # called contents.
+        # TODO:
+        #   This may be optimizable - by sorting in advance and possibly
+        #   attaching compiled templates all the way. The only problem is the
+        #   difference between application called contents and controller
+        #   called contents.
 
         # The blocks are based on elements from the global
         # hash and from the stash
@@ -225,10 +226,10 @@ Register plugin in a L<Mojolicious> application.
   %= content_block 'admin'
 
 Add content to a named content block (like with
-L<Mojolicious::Plugin::DefaultHelpers/content_for|content_for>)
+L<content_for|Mojolicious::Plugin::DefaultHelpers/content_for>)
 and call the contents from a template.
 
-In difference to L<Mojolicious::Plugin::DefaultHelpers/content_for|content_for>,
+In difference to L<content_for|Mojolicious::Plugin::DefaultHelpers/content_for>,
 content of the content block can be defined in a global cache during
 startup.
 
@@ -262,7 +263,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015-2016, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2015-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.
