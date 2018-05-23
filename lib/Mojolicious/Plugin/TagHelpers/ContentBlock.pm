@@ -2,7 +2,7 @@ package Mojolicious::Plugin::TagHelpers::ContentBlock;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream 'b';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # Sort based on the manual given position
 # or the order the element was added
