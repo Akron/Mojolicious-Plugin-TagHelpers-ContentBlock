@@ -30,7 +30,14 @@ sub _position_sort {
 
 # Register the plugin
 sub register {
-  my ($self, $app) = @_;
+  my ($self, $app, $param) = @_;
+
+  $param ||= {};
+
+  # Load parameter from Config file
+  if (my $config_param = $app->config('TagHelpers-ContentBlock')) {
+    $param = { %$param, %$config_param };
+  };
 
   # Store content blocks issued from plugins
   my %content_block;
@@ -99,14 +106,14 @@ sub register {
       $element{position} //= 0;
       $element{position_b} = scalar @{$content_block{$name}};
 
-      # Probably called from app
+      # Called from controller
       if ($c->tx->{req}) {
 
         # Add template to content block
         push(@{$c->stash->{'cblock.' . $name} ||= []}, \%element);
       }
 
-      # Called from controller
+      # Probably called from app
       else {
 
         # Add template to content block
@@ -128,6 +135,22 @@ sub register {
       return;
     }
   );
+
+  # Iterate over all parameters
+  while (my ($name, $value) = each %$param) {
+
+    # Only a single block
+    if (ref $value eq 'HASH') {
+      $app->content_block($name => %$value);
+    }
+
+    # Multiple blocks for this name
+    elsif (ref $value eq 'ARRAY') {
+      foreach (@$value) {
+        $app->content_block($name => %$_);
+      };
+    };
+  };
 };
 
 
@@ -182,7 +205,7 @@ Mojolicious::Plugin::TagHelpers::ContentBlock - Mojolicious Plugin for Content B
 L<Mojolicious::Plugin::TagHelpers::ContentBlock> is a L<Mojolicious> plugin
 to create pluggable content blocks for page views.
 
-B<Warning! This is early software! Use at your own risk!>
+B<Warning! This is experimental software! Use at your own risk!>
 
 
 =head1 METHODS
@@ -193,9 +216,44 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 register
 
-  $plugin->register(Mojolicious->new);
+  # Mojolicious
+  $app->plugin('TagHelpers::ContentBlock');
 
-Register plugin in a L<Mojolicious> application.
+  # Mojolicious::Lite
+  plugin 'TagHelpers::ContentBlock';
+
+Called when registering the plugin.
+Accepts an optional hash containing information
+on content blocks to be registered on startup.
+
+  # Mojolicious
+  $app->plugin(
+    'TagHelpers::ContentBlock' => {
+      admin => [
+        {
+          inline => '<%= link_to "Edit" => "/edit" %>',
+          position => 10
+        },
+        {
+          inline => '<%= link_to "Logout" => "/logout" %>',
+          position => 15
+        }
+      ],
+      footer => {
+        inline => '<%= link_to "Privacy" => "/privacy" %>',
+        position => 5
+      }
+    }
+  );
+
+Content blocks are defined by their name followed by
+either a hash of content block information or an array
+of content block information hashes.
+See L<content_block> for further information.
+
+The content block hash can be set either as part
+of the configuration file with the key C<TagHelpers-ContentBlock> or
+on registration (that can be overwritten by configuration).
 
 
 =head1 HELPERS

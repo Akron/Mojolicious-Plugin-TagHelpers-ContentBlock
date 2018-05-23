@@ -1,3 +1,8 @@
+0.05 2018-95-23
+        - Fixed POD.
+        - Introduced configuration
+          based content blocks.
+
 0.04 2017-06-13
         - Made access rights Kwalitee compliant.
         - Improved string handling without return values.
