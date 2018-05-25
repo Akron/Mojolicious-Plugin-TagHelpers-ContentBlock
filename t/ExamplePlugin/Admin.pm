@@ -10,10 +10,10 @@ sub register {
   };
 
   $app->content_block(
-    administration => (
+    administration => {
       inline => q!<%= link_to 'Admin', '/admin', rel => 'admin' %>!,
       position => 10
-    )
+    }
   );
 
 };

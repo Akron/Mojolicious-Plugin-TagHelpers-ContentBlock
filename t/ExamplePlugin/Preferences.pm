@@ -16,10 +16,10 @@ sub register {
   push @{$app->renderer->paths}, $path;
 
   $app->content_block(
-    administration => (
+    administration => {
       template => 'preferences',
       position => 15
-    )
+    }
   );
 };
 

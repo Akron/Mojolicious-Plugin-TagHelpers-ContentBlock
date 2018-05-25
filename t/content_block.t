@@ -95,10 +95,10 @@ get '/withhome' => sub {
   my $c = shift;
 
   $c->content_block(
-    administration => (
+    administration => {
       inline => q!<%= link_to 'Home' => '/home', rel => 'home' %>!,
       position => 1000
-    )
+    }
   );
 
   $c->render(inline => $navi_template);
@@ -126,9 +126,9 @@ $t->get_ok('/')
 get '/dynamic' => sub {
   my $c = shift;
   if ($c->param('key')) {
-    $c->content_block(dynamic => (
+    $c->content_block(dynamic => {
       inline => '<li>Huhu!</li>'
-    ));
+    });
   };
   $c->render(inline => $navi_dynamic_template);
 };

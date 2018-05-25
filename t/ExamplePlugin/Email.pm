@@ -10,10 +10,10 @@ sub register {
   };
 
   $app->content_block(
-    administration => (
+    administration => {
       inline => q!<%= link_to stash('email_address'), '/email', rel => 'email' %>!,
       position => 1000
-    )
+    }
   );
 
 };

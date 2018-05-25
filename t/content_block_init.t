@@ -51,10 +51,10 @@ get '/footer' => sub {
 
 get '/footer2' => sub {
   my $c = shift;
-  $c->content_block(footer => (
+  $c->content_block(footer => {
     inline => '<%= link_to "Admin" => "admin" %>',
     position => 2
-  ));
+  });
   $c->render(inline => $navi_footer_template);
 };
 

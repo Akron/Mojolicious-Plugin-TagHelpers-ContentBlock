@@ -12,7 +12,7 @@ ok(!app->content_block_ok('admin'), 'Nothing in the content block');
 my $template =<< 'NAVI';
 % if (content_block_ok('admin')) {
   <nav>
-  %= content_block 'admin', separator => 'hui'
+  %= content_block 'admin', parameter => 'hui'
   </nav>
 % };
 NAVI

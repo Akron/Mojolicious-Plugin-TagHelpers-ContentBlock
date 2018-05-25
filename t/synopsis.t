@@ -7,19 +7,19 @@ plugin 'TagHelpers::ContentBlock';
 
 # Add snippets to a named content block, e.g. from a plugin
 app->content_block(
-  admin => (
+  admin => {
     inline => "<%= link_to 'Edit' => '/edit' %>"
-  )
+  }
 );
 
 # or in a controller:
 get '/' => sub {
   my $c = shift;
   $c->content_block(
-    admin => (
+    admin => {
       inline => "<%= link_to 'Logout' => '/logout' %>",
       position => 20
-    )
+    }
   );
   $c->render(template => 'home');
 };

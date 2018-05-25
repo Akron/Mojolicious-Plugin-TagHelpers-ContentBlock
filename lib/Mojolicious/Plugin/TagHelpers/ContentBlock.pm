@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::TagHelpers::ContentBlock;
 use Mojo::Base 'Mojolicious::Plugin';
-use Mojo::Util qw/trim/;
+use Mojo::Util qw/trim deprecated/;
 use Mojo::ByteStream 'b';
 
 our $VERSION = '0.06';
@@ -70,25 +70,34 @@ sub register {
         $block->{cb} = $cb;
       };
 
+      # Potential legacy treatment
+      # REMOVE in future version
       if (@_) {
+
+        my $legacy = 0;
 
         # TODO: Legacy code for non-hash parameters
         if ($param{template}) {
           $block //= {};
           $block->{template} = delete $param{template};
+          $legacy++;
         }
 
         # TODO: Legacy code for non-hash parameters
         elsif ($param{inline}) {
           $block //= {};
           $block->{inline} = delete $param{inline};
+          $legacy++;
         };
 
         # TODO: Legacy code for non-hash parameters
         if ($param{position}) {
           return unless $block;
           $block->{position} = delete $param{position};
+          $legacy++;
         };
+
+        deprecated 'ContentBlocks: Passing block parameters as a list is deprecated' if $legacy;
       };
 
       # No block passed - return content block
@@ -179,13 +188,13 @@ sub register {
 
     # Only a single block
     if (ref $value eq 'HASH') {
-      $app->content_block($name => %$value);
+      $app->content_block($name => $value);
     }
 
     # Multiple blocks for this name
     elsif (ref $value eq 'ARRAY') {
       foreach (@$value) {
-        $app->content_block($name => %$_);
+        $app->content_block($name => $_);
       };
     };
   };

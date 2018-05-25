@@ -54,10 +54,10 @@ get '/withhome' => sub {
   my $c = shift;
 
   $c->content_block(
-    administration => (
+    administration => {
       inline => q!<%= link_to 'Home' => '/home', rel => 'home' %>!,
       position => 20
-    )
+    }
   );
 
   $c->render(inline => $navi_template);
