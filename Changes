@@ -1,4 +1,8 @@
-0.05 2018-95-23
+0.06 2018-05-25
+        - Deprecated array parameter use
+          in favor of hash parameter use
+
+0.05 2018-05-23
         - Fixed POD.
         - Introduced configuration
           based content blocks.

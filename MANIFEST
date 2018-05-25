@@ -2,6 +2,7 @@ lib/Mojolicious/Plugin/TagHelpers/ContentBlock.pm
 t/content_block.t
 t/content_block_position.t
 t/content_block_init.t
+t/content_block_separator.t
 t/synopsis.t
 t/ExamplePlugin/Admin.pm
 t/ExamplePlugin/Email.pm

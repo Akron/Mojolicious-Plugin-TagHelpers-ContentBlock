@@ -1,8 +1,15 @@
 package Mojolicious::Plugin::TagHelpers::ContentBlock;
 use Mojo::Base 'Mojolicious::Plugin';
+use Mojo::Util qw/trim/;
 use Mojo::ByteStream 'b';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
+
+# TODO:
+#   When a named contentblock is in the
+#   configuration and in the init hash,
+#   merge the values instead of overwriting.
+
 
 # Sort based on the manual given position
 # or the order the element was added
@@ -48,8 +55,44 @@ sub register {
       my $c = shift;
       my $name = shift;
 
-      # No template passed - return content
-      unless (@_) {
+      # Get the last element as a template callback
+      my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+
+      # Block information passed as a hashref
+      my $block = ref $_[-1] eq 'HASH' ? pop : undef;
+
+      # Receive all other parameters
+      my %param = @_;
+
+      # Set callback parameter
+      if ($cb) {
+        $block //= {};
+        $block->{cb} = $cb;
+      };
+
+      if (@_) {
+
+        # TODO: Legacy code for non-hash parameters
+        if ($param{template}) {
+          $block //= {};
+          $block->{template} = delete $param{template};
+        }
+
+        # TODO: Legacy code for non-hash parameters
+        elsif ($param{inline}) {
+          $block //= {};
+          $block->{inline} = delete $param{inline};
+        };
+
+        # TODO: Legacy code for non-hash parameters
+        if ($param{position}) {
+          return unless $block;
+          $block->{position} = delete $param{position};
+        };
+      };
+
+      # No block passed - return content block
+      unless ($block) {
         my $string = '';
 
         # TODO:
@@ -69,55 +112,50 @@ sub register {
         # Iterate over default and stash content blocks
         foreach (sort _position_sort @blocks) {
 
+          my $value;
+
           # Render inline template
           if ($_->{inline}) {
-            $string .= $c->render_to_string(inline => $_->{inline}) // '';
+            $value = $c->render_to_string(inline => $_->{inline}) // '';
           }
 
           # Render template
           elsif ($_->{template}) {
-            $string .= $c->render_to_string(template => $_->{template}) // '';
+            $value = $c->render_to_string(template => $_->{template}) // '';
           }
 
           # Render callback
           elsif ($_->{cb}) {
-            $string .= $_->($c) // '';
+            $value = $_->($c) // '';
           };
+
+          $string .= trim $value if $value;
         };
 
         # Return content block
         return b($string);
       };
 
-
-      # Parameter number is odd - get the last element as a template callback
-      my $cb = pop if @_ % 2;
-
-      my %element = @_;
-
       # Content block not yet defined
       $content_block{$name} ||= [];
 
-      # The template may be defined either as 'cb', 'template' or 'inline'
-      $element{cb} = $cb if $cb;
-
       # Two position definitions - first manually defined,
       # the second based on the position in the block
-      $element{position} //= 0;
-      $element{position_b} = scalar @{$content_block{$name}};
+      $block->{position} //= 0;
+      $block->{position_b} = scalar @{$content_block{$name}};
 
       # Called from controller
       if ($c->tx->{req}) {
 
         # Add template to content block
-        push(@{$c->stash->{'cblock.' . $name} ||= []}, \%element);
+        push(@{$c->stash->{'cblock.' . $name} ||= []}, $block);
       }
 
       # Probably called from app
       else {
 
         # Add template to content block
-        push(@{$content_block{$name}}, \%element);
+        push(@{$content_block{$name}}, $block);
       };
     }
   );
@@ -176,19 +214,19 @@ Mojolicious::Plugin::TagHelpers::ContentBlock - Mojolicious Plugin for Content B
 
   # Add snippets to a named content block, e.g. from a plugin
   app->content_block(
-    admin => (
+    admin => {
       inline => "<%= link_to 'Edit' => '/edit' %>"
-    )
+    }
   );
 
-  # or in a controller:
+  # ... or in a controller:
   get '/' => sub {
     my $c = shift;
     $c->content_block(
-      admin => (
+      admin => {
         inline => "<%= link_to 'Logout' => '/logout' %>",
         position => 20
-      )
+       }
     );
     $c->render(template => 'home');
   };
@@ -197,7 +235,7 @@ Mojolicious::Plugin::TagHelpers::ContentBlock - Mojolicious Plugin for Content B
 
   __DATA__
   @@ home.html.ep
-  %# Call in a template
+  %# and call it in a template
   %= content_block 'admin'
 
 =head1 DESCRIPTION
@@ -262,21 +300,21 @@ on registration (that can be overwritten by configuration).
 
   # In a plugin
   $app->content_block(
-    admin => (
+    admin => {
       inline => '<%= link_to 'Edit' => '/edit' %>'
-    )
+    }
   );
 
   # From a controller
   $c->content_block(
-    admin => (
+    admin => {
       inline => '<%= link_to 'Edit' => '/edit' %>',
       position => 40
-    )
+    }
   );
 
   # From a template
-  % content_block 'admin', position => 9, begin
+  % content_block 'admin', { position => 9 }, begin
     <%= link_to 'Edit' => '/edit' %>
   % end
 
