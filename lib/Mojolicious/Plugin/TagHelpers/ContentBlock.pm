@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util qw/trim deprecated/;
 use Mojo::ByteStream 'b';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # TODO:
 #   When a named contentblock is in the
@@ -62,7 +62,7 @@ sub register {
       my $block = ref $_[-1] eq 'HASH' ? pop : undef;
 
       # Receive all other parameters
-      my %param = @_;
+      my %hparam = @_;
 
       # Set callback parameter
       if ($cb) {
@@ -77,23 +77,23 @@ sub register {
         my $legacy = 0;
 
         # TODO: Legacy code for non-hash parameters
-        if ($param{template}) {
+        if ($hparam{template}) {
           $block //= {};
-          $block->{template} = delete $param{template};
+          $block->{template} = delete $hparam{template};
           $legacy++;
         }
 
         # TODO: Legacy code for non-hash parameters
-        elsif ($param{inline}) {
+        elsif ($hparam{inline}) {
           $block //= {};
-          $block->{inline} = delete $param{inline};
+          $block->{inline} = delete $hparam{inline};
           $legacy++;
         };
 
         # TODO: Legacy code for non-hash parameters
-        if ($param{position}) {
+        if ($hparam{position}) {
           return unless $block;
-          $block->{position} = delete $param{position};
+          $block->{position} = delete $hparam{position};
           $legacy++;
         };
 
@@ -118,6 +118,8 @@ sub register {
           push(@blocks, @{$c->stash('cblock.'. $name)});
         };
 
+        my $sep = $hparam{separator};
+
         # Iterate over default and stash content blocks
         foreach (sort _position_sort @blocks) {
 
@@ -138,7 +140,13 @@ sub register {
             $value = $_->($c) // '';
           };
 
-          $string .= trim $value if $value;
+          # There is a defined block
+          if ($value) {
+
+            # Add separator if needed
+            $string .= $sep if $string && $sep;
+            $string .= trim $value;
+          };
         };
 
         # Return content block
@@ -174,11 +182,18 @@ sub register {
     content_block_ok => sub {
       my ($c, $name) = @_;
 
+      # Negative
       return unless $name;
+
+      # Positive
       if ($content_block{$name}) {
         return 1 if @{$content_block{$name}};
       };
+
+      # Positive
       return 1 if $c->stash('cblock.'. $name);
+
+      # Negative
       return;
     }
   );
@@ -258,7 +273,7 @@ B<Warning! This is experimental software! Use at your own risk!>
 =head1 METHODS
 
 L<Mojolicious::Plugin::TagHelpers::ContentBlock> inherits all methods from
-L<Mojolicious::Plugin> and implements the following new ones.
+L<Mojolicious::Plugin> and implements the following new one.
 
 
 =head2 register
@@ -332,16 +347,22 @@ on registration (that can be overwritten by configuration).
 
 Add content to a named content block (like with
 L<content_for|Mojolicious::Plugin::DefaultHelpers/content_for>)
-and call the contents from a template.
+or call the contents from a template.
 
 In difference to L<content_for|Mojolicious::Plugin::DefaultHelpers/content_for>,
 content of the content block can be defined in a global cache during
-startup.
+startup or as part of the applications configuration.
 
-Supported content parameters are C<template> or C<inline>.
+Supported content block parameters, passed as a hash, are C<template> or C<inline>.
 Additionally a numeric C<position> value can be passed, defining the order of elements
 in the content block. If C<position> is omitted,
 the default position is C<0>. Position values may be positive or negative.
+
+When calling the content blocks, an additional list parameter L<separator>
+can define a string to be placed between all blocks.
+
+  # Calling the content block
+  %= content_block 'admin', separator => '<hr />'
 
 
 =head2 content_block_ok
