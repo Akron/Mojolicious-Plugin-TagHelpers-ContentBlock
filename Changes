@@ -1,3 +1,7 @@
+0.08 2018-05-27
+        - Merge parameters of configuration
+          files instead of overwriting.
+
 0.07 2018-05-25
         - Introduced separator.
 

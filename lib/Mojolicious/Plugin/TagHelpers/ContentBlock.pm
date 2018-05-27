@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util qw/trim deprecated/;
 use Mojo::ByteStream 'b';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # TODO:
 #   When a named contentblock is in the
@@ -42,8 +42,25 @@ sub register {
   $param ||= {};
 
   # Load parameter from Config file
-  if (my $config_param = $app->config('TagHelpers-ContentBlock')) {
-    $param = { %$param, %$config_param };
+  if (my $c_param = $app->config('TagHelpers-ContentBlock')) {
+    foreach (keys %$c_param) {
+
+      # block already defined
+      if (defined $param->{$_}) {
+        if (ref $param->{$_} eq 'HASH') {
+          $param->{$_} = [$param->{$_}];
+        };
+
+        # Push configuration parameter to given block
+        push @{$param->{$_}},
+          ref $c_param->{$_} eq 'HASH' ? $c_param->{$_} : @{$c_param->{$_}};
+      }
+
+      # Newly defined
+      else {
+        $param->{$_} = $c_param->{$_};
+      }
+    };
   };
 
   # Store content blocks issued from plugins
@@ -313,9 +330,9 @@ either a hash of content block information or an array
 of content block information hashes.
 See L<content_block> for further information.
 
-The content block hash can be set either as part
+The content block hash can be set as part
 of the configuration file with the key C<TagHelpers-ContentBlock> or
-on registration (that can be overwritten by configuration).
+on registration (that will be merged with the configuration).
 
 
 =head1 HELPERS

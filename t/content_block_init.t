@@ -5,6 +5,17 @@ use Mojolicious::Lite;
 use Test::Mojo;
 use lib '.', 't';
 
+plugin Config => {
+  default => {
+    'TagHelpers-ContentBlock' => {
+      footer => {
+        inline => '<%= link_to "Copyright" => "/copyright" %>',
+        position => 10
+      }
+    }
+  }
+};
+
 plugin 'TagHelpers::ContentBlock' => {
   admin => [
     {
@@ -73,22 +84,23 @@ $t->get_ok('/footer')
   ->text_is('#error', '')
   ->status_is(200)
   ->element_exists('nav')
-  ->element_count_is('nav > *', 1);
+  ->element_count_is('nav > *', 2);
 
 $t->get_ok('/footer2')
   ->text_is('#error', '')
   ->status_is(200)
   ->element_exists('nav')
-  ->element_count_is('nav > *', 2)
+  ->element_count_is('nav > *', 3)
   ->text_is('nav > a:nth-of-type(1)', 'Admin')
   ->text_is('nav > a:nth-of-type(2)', 'Privacy')
+  ->text_is('nav > a:nth-of-type(3)', 'Copyright')
   ;
 
 $t->get_ok('/footer')
   ->text_is('#error', '')
   ->status_is(200)
   ->element_exists('nav')
-  ->element_count_is('nav > *', 1);
+  ->element_count_is('nav > *', 2);
 
 done_testing;
 __END__
