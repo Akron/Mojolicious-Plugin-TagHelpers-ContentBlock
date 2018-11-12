@@ -15,19 +15,19 @@ Mojolicious::Plugin::TagHelpers::ContentBlock - Mojolicious Plugin for Content B
 
   # Add snippets to a named content block, e.g. from a plugin
   app->content_block(
-    admin => (
+    admin => {
       inline => "<%= link_to 'Edit' => '/edit' %>"
-    )
+    }
   );
 
-  # or in a controller:
+  # ... or in a controller:
   get '/' => sub {
     my $c = shift;
     $c->content_block(
-      admin => (
+      admin => {
         inline => "<%= link_to 'Logout' => '/logout' %>",
         position => 20
-      )
+       }
     );
     $c->render(template => 'home');
   };
@@ -36,7 +36,7 @@ Mojolicious::Plugin::TagHelpers::ContentBlock - Mojolicious Plugin for Content B
 
   __DATA__
   @@ home.html.ep
-  %# Call in a template
+  %# and call it in a template
   %= content_block 'admin'
 
 =head1 DESCRIPTION
@@ -50,7 +50,7 @@ B<Warning! This is experimental software! Use at your own risk!>
 =head1 METHODS
 
 L<Mojolicious::Plugin::TagHelpers::ContentBlock> inherits all methods from
-L<Mojolicious::Plugin> and implements the following new ones.
+L<Mojolicious::Plugin> and implements the following new one.
 
 
 =head2 register
@@ -90,9 +90,9 @@ either a hash of content block information or an array
 of content block information hashes.
 See L<content_block> for further information.
 
-The content block hash can be set either as part
+The content block hash can be set as part
 of the configuration file with the key C<TagHelpers-ContentBlock> or
-on registration (that can be overwritten by configuration).
+on registration (that will be merged with the configuration).
 
 
 =head1 HELPERS
@@ -101,21 +101,21 @@ on registration (that can be overwritten by configuration).
 
   # In a plugin
   $app->content_block(
-    admin => (
+    admin => {
       inline => '<%= link_to 'Edit' => '/edit' %>'
-    )
+    }
   );
 
   # From a controller
   $c->content_block(
-    admin => (
+    admin => {
       inline => '<%= link_to 'Edit' => '/edit' %>',
       position => 40
-    )
+    }
   );
 
   # From a template
-  % content_block 'admin', position => 9, begin
+  % content_block 'admin', { position => 9 }, begin
     <%= link_to 'Edit' => '/edit' %>
   % end
 
@@ -124,16 +124,22 @@ on registration (that can be overwritten by configuration).
 
 Add content to a named content block (like with
 L<content_for|Mojolicious::Plugin::DefaultHelpers/content_for>)
-and call the contents from a template.
+or call the contents from a template.
 
 In difference to L<content_for|Mojolicious::Plugin::DefaultHelpers/content_for>,
 content of the content block can be defined in a global cache during
-startup.
+startup or as part of the applications configuration.
 
-Supported content parameters are C<template> or C<inline>.
+Supported content block parameters, passed as a hash, are C<template> or C<inline>.
 Additionally a numeric C<position> value can be passed, defining the order of elements
 in the content block. If C<position> is omitted,
 the default position is C<0>. Position values may be positive or negative.
+
+When calling the content blocks, an additional list parameter L<separator>
+can define a string to be placed between all blocks.
+
+  # Calling the content block
+  %= content_block 'admin', separator => '<hr />'
 
 
 =head2 content_block_ok
