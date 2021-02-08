@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util qw/trim deprecated/;
 use Mojo::ByteStream 'b';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # TODO:
 #   When a named contentblock is in the
@@ -406,7 +406,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2015-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.
