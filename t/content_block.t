@@ -36,7 +36,7 @@ my $navi_dynamic_template =<< 'NAVI';
 NAVI
 
 app->defaults(
-  email_address => 'akron@sojolicio.us'
+  email_address => 'akron@sojolicious.example'
 );
 
 get '/' => sub {
@@ -76,11 +76,11 @@ $t->get_ok('/')
   ->element_count_is('nav > *', 2)
   ->text_is('nav > a', 'Admin')
   ->text_is('nav > a[rel=admin]', 'Admin')
-  ->text_is('nav > a[rel=email]', 'akron@sojolicio.us');
+  ->text_is('nav > a[rel=email]', 'akron@sojolicious.example');
 
 get '/newmail' => sub {
   my $c = shift;
-  $c->stash(email_address => 'peter@sojolicio.us');
+  $c->stash(email_address => 'peter@sojolicious.example');
   $c->render(inline => $navi_template);
 };
 
@@ -89,7 +89,7 @@ $t->get_ok('/newmail')
   ->element_count_is('nav > *', 2)
   ->text_is('nav > a', 'Admin')
   ->text_is('nav > a[rel=admin]', 'Admin')
-  ->text_is('nav > a[rel=email]', 'peter@sojolicio.us');
+  ->text_is('nav > a[rel=email]', 'peter@sojolicious.example');
 
 get '/withhome' => sub {
   my $c = shift;
@@ -111,7 +111,7 @@ $t->get_ok('/withhome')
   ->element_count_is('nav > *', 3)
   ->text_is('nav > a', 'Admin')
   ->text_is('nav > a[rel=admin]', 'Admin')
-  ->text_is('nav > a[rel=email]', 'akron@sojolicio.us')
+  ->text_is('nav > a[rel=email]', 'akron@sojolicious.example')
   ->text_is('nav > a[rel=home]', 'Home');
 
 $t->get_ok('/')
@@ -119,7 +119,7 @@ $t->get_ok('/')
   ->element_count_is('nav > *', 2)
   ->text_is('nav > a', 'Admin')
   ->text_is('nav > a[rel=admin]', 'Admin')
-  ->text_is('nav > a[rel=email]', 'akron@sojolicio.us');
+  ->text_is('nav > a[rel=email]', 'akron@sojolicious.example');
 
 
 # Check dynamic templates

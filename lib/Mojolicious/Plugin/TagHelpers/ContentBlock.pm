@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util qw/trim deprecated/;
 use Mojo::ByteStream 'b';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # TODO:
 #   When a named contentblock is in the

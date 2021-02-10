@@ -17,7 +17,7 @@ my $navi_template =<< 'NAVI';
 NAVI
 
 app->defaults(
-  email_address => 'akron@sojolicio.us'
+  email_address => 'akron@sojolicious.example'
 );
 
 get '/' => sub {
@@ -45,9 +45,9 @@ $t->get_ok('/')
   ->element_count_is('nav > *', 2)
   ->text_is('nav > a', 'Admin')
   ->text_is('nav > a[rel=admin]', 'Admin')
-  ->text_is('nav > a[rel=email]', 'akron@sojolicio.us')
+  ->text_is('nav > a[rel=email]', 'akron@sojolicious.example')
   ->text_is('nav > a:nth-of-type(1)', 'Admin')
-  ->text_is('nav > a:nth-of-type(2)', 'akron@sojolicio.us')
+  ->text_is('nav > a:nth-of-type(2)', 'akron@sojolicious.example')
   ;
 
 get '/withhome' => sub {
@@ -70,7 +70,7 @@ $t->get_ok('/withhome')
   ->text_is('nav > a', 'Admin')
   ->text_is('nav > a:nth-of-type(1)', 'Admin')
   ->text_is('nav > a:nth-of-type(2)', 'Home')
-  ->text_is('nav > a:nth-of-type(3)', 'akron@sojolicio.us')
+  ->text_is('nav > a:nth-of-type(3)', 'akron@sojolicious.example')
   ;
 
 app->plugin('Preferences');
@@ -81,7 +81,7 @@ $t->get_ok('/withhome')
   ->text_is('nav > a:nth-of-type(1)', 'Admin')
   ->text_is('nav > a:nth-of-type(2)', 'Preferences')
   ->text_is('nav > a:nth-of-type(3)', 'Home')
-  ->text_is('nav > a:nth-of-type(4)', 'akron@sojolicio.us')
+  ->text_is('nav > a:nth-of-type(4)', 'akron@sojolicious.example')
   ;
 
 $t->get_ok('/')
@@ -89,7 +89,7 @@ $t->get_ok('/')
   ->element_count_is('nav > *', 3)
   ->text_is('nav > a:nth-of-type(1)', 'Admin')
   ->text_is('nav > a:nth-of-type(2)', 'Preferences')
-  ->text_is('nav > a:nth-of-type(3)', 'akron@sojolicio.us')
+  ->text_is('nav > a:nth-of-type(3)', 'akron@sojolicious.example')
   ;
 
 
