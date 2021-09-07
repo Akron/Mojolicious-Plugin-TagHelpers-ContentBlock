@@ -71,36 +71,45 @@ get '/footer2' => sub {
 
 my $t = Test::Mojo->new;
 
-$t->get_ok('/admin')
-  ->text_is('#error', '')
+my $err = $t->get_ok('/admin')
   ->status_is(200)
   ->element_exists('nav')
   ->element_count_is('nav > *', 2)
   ->text_is('nav > a:nth-of-type(1)', 'Edit')
   ->text_is('nav > a:nth-of-type(2)', 'Logout')
+  ->tx->res->dom->at('#error')
+  ;
+is(defined $err ? $err->text : '', '');
   ;
 
-$t->get_ok('/footer')
-  ->text_is('#error', '')
+$err = $t->get_ok('/footer')
   ->status_is(200)
   ->element_exists('nav')
-  ->element_count_is('nav > *', 2);
+  ->element_count_is('nav > *', 2)
+  ->tx->res->dom->at('#error')
+  ;
+is(defined $err ? $err->text : '', '');
 
-$t->get_ok('/footer2')
-  ->text_is('#error', '')
+
+$err = $t->get_ok('/footer2')
   ->status_is(200)
   ->element_exists('nav')
   ->element_count_is('nav > *', 3)
   ->text_is('nav > a:nth-of-type(1)', 'Admin')
   ->text_is('nav > a:nth-of-type(2)', 'Privacy')
   ->text_is('nav > a:nth-of-type(3)', 'Copyright')
+  ->tx->res->dom->at('#error')
   ;
+is(defined $err ? $err->text : '', '');
 
-$t->get_ok('/footer')
-  ->text_is('#error', '')
+
+$err = $t->get_ok('/footer')
   ->status_is(200)
   ->element_exists('nav')
-  ->element_count_is('nav > *', 2);
+  ->element_count_is('nav > *', 2)
+  ->tx->res->dom->at('#error')
+  ;
+is(defined $err ? $err->text : '', '');
 
 done_testing;
 __END__

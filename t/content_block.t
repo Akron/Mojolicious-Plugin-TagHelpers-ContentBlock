@@ -49,17 +49,21 @@ get '/nonopt' => sub {
 
 my $t = Test::Mojo->new;
 
-$t->get_ok('/')
-  ->text_is('#error', '')
+my $err = $t->get_ok('/')
   ->status_is(200)
   ->element_exists_not('nav')
-  ->element_count_is('nav > *', 0);
+  ->element_count_is('nav > *', 0)
+  ->tx->res->dom->at('#error')
+  ;
+is(defined $err ? $err->text : '', '');
 
-$t->get_ok('/nonopt')
-  ->text_is('#error', '')
+$err = $t->get_ok('/nonopt')
   ->status_is(200)
   ->element_exists('nav')
-  ->element_count_is('nav > *', 0);
+  ->element_count_is('nav > *', 0)
+  ->tx->res->dom->at('#error')
+  ;
+is(defined $err ? $err->text : '', '');
 
 app->plugin('Admin');
 
