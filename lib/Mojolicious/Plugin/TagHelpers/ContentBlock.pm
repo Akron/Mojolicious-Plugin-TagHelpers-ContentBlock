@@ -284,8 +284,6 @@ Mojolicious::Plugin::TagHelpers::ContentBlock - Mojolicious Plugin for Content B
 L<Mojolicious::Plugin::TagHelpers::ContentBlock> is a L<Mojolicious> plugin
 to create pluggable content blocks for page views.
 
-B<Warning! This is experimental software! Use at your own risk!>
-
 
 =head1 METHODS
 

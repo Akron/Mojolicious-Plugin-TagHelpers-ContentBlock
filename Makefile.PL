@@ -7,14 +7,18 @@ WriteMakefile(
   NAME         => 'Mojolicious::Plugin::TagHelpers::ContentBlock',
   VERSION_FROM => 'lib/Mojolicious/Plugin/TagHelpers/ContentBlock.pm',
   AUTHOR       => 'Nils Diewald',
+  ABSTRACT     => 'Mojolicious Plugin for Content Blocks',
+  BUILD_REQUIRES => {
+    'Test::More' => 0,
+  },
   PREREQ_PM    => {
     'Mojolicious' => '6.22',
-    'Test::More' => 0
   },
   test         => {
     TESTS => 't/*.t'
   },
-  LICENSE      => 'perl',
+  MIN_PERL_VERSION => '5.010001',
+  LICENSE      => 'artistic_2',
   META_MERGE   => {
     'meta-spec' => { version => 2 },
     requires  => {perl => '5.010001'},
